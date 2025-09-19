@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpotOn - Your Only Destination for Destinations</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: #2d3748;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    header {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.8rem 2.5rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+    }
+
+    .logo-main {
+      font-weight: 800;
+      font-size: 3rem;
+      letter-spacing: 1.5px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.8rem;
+      color: #ffde59;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .logo-tagline {
+      font-weight: 300;
+      font-size: 1.2rem;
+      opacity: 0.95;
+      letter-spacing: 0.5px;
+      margin-left: 5px;
+    }
+
+    .header-decoration {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .decoration-item {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .main-content {
+      display: flex;
+      min-height: 75vh;
+    }
+
+    @media (max-width: 992px) {
+      .main-content {
+        flex-direction: column;
+      }
+    }
+
+    .map-container {
+      flex: 1;
+      position: relative;
+      min-height: 400px;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .map-overlay {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 300px;
+    }
+
+    .controls-panel {
+      flex: 0 0 400px;
+      background: #f9fafb;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid #e5e7eb;
+      overflow-y: auto;
+    }
+
+    @media (max-width: 992px) {
+      .controls-panel {
+        flex: 1;
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+      }
+    }
+
+    .panel-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 1.1rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+    }
+
+    .slider-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 1.5rem 0;
+    }
+
+    .slider-value {
+      font-weight: 600;
+      color: #667eea;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      background-image: linear-gradient(to right, #667eea, #764ba2);
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #667eea;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s;
+      border: 2px solid white;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: #764ba2;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin: 1.8rem 0;
+    }
+
+    button {
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 1.1rem;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+      box-shadow: 0 4px 10px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+      box-shadow: 0 4px 10px rgba(66, 153, 225, 0.4);
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 1.2rem;
+    }
+
+    .category-btn {
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+    }
+
+    .results-container {
+      margin-top: 1.8rem;
+      flex: 1;
+      overflow-y: auto;
+      border-top: 1px solid #eee;
+      padding-top: 1.5rem;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .results-count {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+
+    .results-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .result-item {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 5px solid #667eea;
+      transition: all 0.25s;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .result-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-left: 5px solid #48bb78;
+    }
+
+    .result-name {
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-size: 1.2rem;
+    }
+
+    .result-details {
+      font-size: 1rem;
+      color: #718096;
+      margin-bottom: 10px;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .result-actions button {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      flex: 1;
+    }
+
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 25px;
+      color: #667eea;
+    }
+
+    .loading-spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .drag-marker-info {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 300px;
+    }
+
+    .instructions {
+      background: #ebf4ff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 5px solid #4299e1;
+    }
+
+    .instructions h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .instructions ol {
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin-bottom: 8px;
+      color: #4a5568;
+    }
+
+    .location-marker {
+      filter: hue-rotate(120deg);
+    }
+    
+    .fuel-icon {
+      color: #f56565;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+      font-size: 1rem;
+      background: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .pulse {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ffde59;
+      box-shadow: 0 0 0 rgba(255, 222, 89, 0.4);
+      animation: pulse 2s infinite;
+      margin-left: 5px;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 222, 89, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 222, 89, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 222, 89, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo">
+        <div class="logo-main">
+          <i class="fas fa-location-dot logo-icon"></i>
+          SpotOn
+        </div>
+        <div class="logo-tagline">Your only destination for destinations</div>
+      </div>
+      <div class="header-decoration">
+        <div class="decoration-item"></div>
+        <div class="decoration-item"></div>
+        <div class="decoration-item"></div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <div class="map-container">
+        <div id="map" style="height: 100%; min-height: 400px;"></div>
+        <div class="map-overlay">
+          <i class="fas fa-info-circle"></i>
+          <span id="location-status">Drag the marker to set your location</span>
+        </div>
+        <div class="drag-marker-info">
+          <i class="fas fa-hand-point-up"></i>
+          <span>Drag the marker to set your search location</span>
+        </div>
+        <div id="loading">
+          <div class="loading-spinner"></div>
+          <p>Searching for places...</p>
+        </div>
+      </div>
+
+      <div class="controls-panel">
+        <h2 class="panel-title"><i class="fas fa-search"></i> Search Settings</h2>
+        
+        <div class="instructions">
+          <h3><i class="fas fa-lightbulb"></i> How to use</h3>
+          <ol>
+            <li>Drag the marker to set your desired location</li>
+            <li>Select what you're looking for (or type directly)</li>
+            <li>Adjust search radius if needed</li>
+            <li>Click Search Nearby or use quick categories</li>
+          </ol>
+        </div>
+        
+        <div class="input-group">
+          <label for="query"><i class="fas fa-search-location"></i> What are you looking for?</label>
+          <input type="text" id="query" placeholder="e.g. restaurant, petrol pump, hospital" value="restaurant">
+        </div>
+        
+        <div class="slider-container">
+          <label for="radius">Search Radius: <span id="radiusVal">2000</span> meters</label>
+          <input type="range" id="radius" min="500" max="10000" step="500" value="2000">
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-primary" onclick="searchPlaces()">
+            <i class="fas fa-search"></i> Search Nearby
+          </button>
+          <button class="btn-success" onclick="useMyLocation()">
+            <i class="fas fa-location-arrow"></i> Use My Current Location
+          </button>
+        </div>
+        
+        <h3 class="panel-title"><i class="fas fa-bolt"></i> Quick Categories</h3>
+        <div class="categories">
+          <button class="category-btn btn-secondary" onclick="quickSearch('restaurant')">
+            <i class="fas fa-utensils"></i> Restaurants
+          </button>
+          <button class="category-btn btn-secondary" onclick="quickSearch('fuel')">
+            <i class="fas fa-gas-pump fuel-icon"></i> Petrol Pumps
+          </button>
+          <button class="category-btn btn-secondary" onclick="quickSearch('hospital')">
+            <i class="fas fa-hospital"></i> Hospitals
+          </button>
+          <button class="category-btn btn-secondary" onclick="quickSearch('atm')">
+            <i class="fas fa-money-bill-wave"></i> ATMs
+          </button>
+          <button class="category-btn btn-secondary" onclick="quickSearch('cafe')">
+            <i class="fas fa-coffee"></i> Cafes
+          </button>
+          <button class="category-btn btn-secondary" onclick="quickSearch('pharmacy')">
+            <i class="fas fa-pills"></i> Pharmacy
+          </button>
+        </div>
+        
+        <div class="results-container">
+          <div class="results-header">
+            <h3 class="panel-title"><i class="fas fa-list"></i> Results</h3>
+            <span class="results-count" id="resultsCount">0 found</span>
+          </div>
+          <div class="results-list" id="resultsList">
+            <div class="result-item" style="text-align: center; border: none;">
+              <i class="fas fa-info-circle" style="font-size: 2.5rem; color: #bdc3c7; margin-bottom: 15px;"></i>
+              <p>Drag the marker to set your location and search for nearby places</p>
+              <p class="result-details">Results will appear here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>SpotOn &copy; 2023 | Your only destination for destinations <span class="pulse"></span></p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Initialize map with a defined view and layers
+    let map = L.map('map').setView([28.61, 77.23], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    
+    let markers = [];
+    let userLocation = { lat: 28.61, lng: 77.23 }; // Default location (Delhi)
+    let locationMarker = null;
+
+    // Create a custom icon for the location marker
+    const locationIcon = L.divIcon({
+      className: 'location-marker',
+      html: '<i class="fas fa-location-dot" style="font-size: 32px; color: #667eea;"></i>',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
+
+    // Add location marker (draggable)
+    locationMarker = L.marker([userLocation.lat, userLocation.lng], {
+      draggable: true,
+      icon: locationIcon,
+      autoPan: true
+    }).addTo(map).bindPopup("Drag me to set your search location").openPopup();
+
+    // Update location when marker is moved
+    locationMarker.on('dragend', function() {
+      const newPos = locationMarker.getLatLng();
+      userLocation = { lat: newPos.lat, lng: newPos.lng };
+      document.getElementById("location-status").innerHTML = "<i class='fas fa-map-marker-alt'></i> Location set by dragging";
+      
+      // Update the map view to center on the new location
+      map.setView([userLocation.lat, userLocation.lng], 14);
+    });
+
+    // Update radius value display
+    document.getElementById("radius").addEventListener("input", e => {
+      document.getElementById("radiusVal").textContent = e.target.value;
+    });
+
+    // Get user's current location
+    function useMyLocation() {
+      if (navigator.geolocation) {
+        document.getElementById("location-status").innerHTML = "<i class='fas fa-spinner fa-spin'></i> Locating...";
+        
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            updateLocation(userLocation.lat, userLocation.lng, "Using your current location");
+          }, 
+          err => {
+            console.error("Geolocation error:", err);
+            let errorMsg = "Location access denied. Using default location.";
+            
+            if (err.code === err.PERMISSION_DENIED) {
+              errorMsg = "Location permission denied. Using default location.";
+            } else if (err.code === err.POSITION_UNAVAILABLE) {
+              errorMsg = "Location information unavailable.";
+            } else if (err.code === err.TIMEOUT) {
+              errorMsg = "Location request timed out.";
+            }
+            
+            document.getElementById("location-status").innerHTML = `<i class='fas fa-exclamation-triangle'></i> ${errorMsg}`;
+            
+            // Use default location (Delhi)
+            userLocation = { lat: 28.61, lng: 77.23 };
+            updateLocation(userLocation.lat, userLocation.lng, "Using default location");
+            
+            alert(`${errorMsg}\n\nYou can drag the marker to select a location manually.`);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+          }
+        );
+      } else {
+        alert("Geolocation is not supported by your browser.");
+        document.getElementById("location-status").innerHTML = "<i class='fas fa-times-circle'></i> Geolocation not supported";
+        
+        // Use default location
+        userLocation = { lat: 28.61, lng: 77.23 };
+        updateLocation(userLocation.lat, userLocation.lng, "Geolocation not supported");
+      }
+    }
+
+    // Update location on map
+    function updateLocation(lat, lng, status) {
+      // Update marker position
+      locationMarker.setLatLng([lat, lng]);
+      
+      // Update the map view
+      map.setView([lat, lng], 14);
+        
+      document.getElementById("location-status").innerHTML = `<i class='fas fa-map-marker-alt'></i> ${status}`;
+    }
+
+    // Search for places
+    async function searchPlaces() {
+      const query = document.getElementById("query").value.trim().toLowerCase();
+      if (!query) {
+        alert("Please enter what you're looking for (e.g. restaurant, petrol pump, hospital)");
+        return;
+      }
+      
+      if (!userLocation) {
+        alert("Please set your location first by dragging the marker or using your current location.");
+        return;
+      }
+
+      const radius = document.getElementById("radius").value;
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("resultsList").innerHTML = "";
+      document.getElementById("resultsCount").textContent = "Searching...";
+
+      // Clear existing markers (except the location marker)
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      try {
+        // Special handling for fuel/petrol stations
+        let overpassQuery;
+        if (query === 'fuel' || query === 'petrol' || query === 'gas' || query.includes('station')) {
+          overpassQuery = `
+            [out:json];
+            (
+              node["amenity"="fuel"](around:${radius},${userLocation.lat},${userLocation.lng});
+              node["amenity"="charging_station"](around:${radius},${userLocation.lat},${userLocation.lng});
+              node["amenity"="gas_station"](around:${radius},${userLocation.lat},${userLocation.lng});
+            );
+            out body;
+          `;
+        } else {
+          // General query for other types
+          overpassQuery = `
+            [out:json];
+            (
+              node["amenity"~"${query}"](around:${radius},${userLocation.lat},${userLocation.lng});
+              node["shop"~"${query}"](around:${radius},${userLocation.lat},${userLocation.lng});
+              node["tourism"~"${query}"](around:${radius},${userLocation.lat},${userLocation.lng});
+              node["leisure"~"${query}"](around:${radius},${userLocation.lat},${userLocation.lng});
+            );
+            out body;
+          `;
+        }
+
+        const encodedQuery = encodeURIComponent(overpassQuery);
+        const url = `https://overpass-api.de/api/interpreter?data=${encodedQuery}`;
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        document.getElementById("loading").style.display = "none";
+
+        if (!data.elements || data.elements.length === 0) {
+          document.getElementById("resultsCount").textContent = "0 found";
+          document.getElementById("resultsList").innerHTML = `
+            <div class="result-item" style="text-align: center; border: none;">
+              <i class="fas fa-exclamation-circle" style="font-size: 2.5rem; color: #bdc3c7; margin-bottom: 15px;"></i>
+              <p>No results found for "${query}" within ${radius} meters</p>
+              <p class="result-details">Try a different search term or larger radius</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Process results
+        document.getElementById("resultsCount").textContent = `${data.elements.length} found`;
+        
+        let resultsHTML = "";
+        data.elements.forEach(place => {
+          if (place.lat && place.lon) {
+            // Add marker to map
+            const marker = L.marker([place.lat, place.lon]).addTo(map);
+            const name = place.tags.name || `Unnamed ${query}`;
+            const street = place.tags['addr:street'] || '';
+            const city = place.tags['addr:city'] || '';
+            const address = street + (city ? ', ' + city : '');
+            
+            marker.bindPopup(`
+              <b>${name}</b><br>
+              ${place.tags.amenity ? 'Type: ' + place.tags.amenity + '<br>' : ''}
+              ${address ? address + '<br>' : ''}
+            `);
+            
+            markers.push(marker);
+            
+            // Add to results list
+            resultsHTML += `
+              <div class="result-item">
+                <div class="result-name">${name}</div>
+                <div class="result-details">
+                  ${address}
+                  ${place.tags.amenity ? '<br>Type: ' + place.tags.amenity : ''}
+                </div>
+                <div class="result-actions">
+                  <button onclick="centerMap(${place.lat}, ${place.lon})" style="background: #667eea;">
+                    <i class="fas fa-map-marker-alt"></i> View on Map
+                  </button>
+                  <button onclick="openDirections(${place.lat}, ${place.lon})" style="background: #48bb78;">
+                    <i class="fas fa-route"></i> Directions
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        });
+        
+        document.getElementById("resultsList").innerHTML = resultsHTML;
+        
+        // Adjust map view to show all markers
+        const group = new L.featureGroup(markers);
+        if (markers.length > 0) {
+          map.fitBounds(group.getBounds().pad(0.1));
+        }
+        
+      } catch (error) {
+        console.error("Search error:", error);
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("resultsCount").textContent = "Error";
+        document.getElementById("resultsList").innerHTML = `
+          <div class="result-item" style="text-align: center; border: none;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 15px;"></i>
+            <p>Error searching for places: ${error.message}</p>
+            <p class="result-details">Please try again later or with a different search term</p>
+          </div>
+        `;
+      }
+    }
+
+    // Quick search for categories
+    function quickSearch(type) {
+      document.getElementById("query").value = type;
+      searchPlaces();
+    }
+
+    // Center map on a specific location
+    function centerMap(lat, lng) {
+      map.setView([lat, lng], 16);
+      // Close any open popups
+      map.closePopup();
+      
+      // Find the marker at this location and open its popup
+      markers.forEach(marker => {
+        const markerLatLng = marker.getLatLng();
+        if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
+          marker.openPopup();
+        }
+      });
+    }
+
+    // Open directions to a place
+    function openDirections(lat, lng) {
+      if (userLocation) {
+        // Use Google Maps for directions
+        const url = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${lat},${lng}&travelmode=driving`;
+        window.open(url, '_blank');
+      } else {
+        alert("Please set your location first to get directions.");
+      }
+    }
+
+    // Initialize with default location
+    window.onload = function() {
+      // Set initial location
+      updateLocation(userLocation.lat, userLocation.lng, "Drag the marker to set your location");
+      
+      // Try to get user's location but don't require it
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            updateLocation(userLocation.lat, userLocation.lng, "Using your current location");
+          }, 
+          err => {
+            // Silently fail - we're already using the default location
+            console.log("Geolocation not available, using default location");
+          }
+        );
+      }
+    };
+  </script>
+</body>
+</html>
