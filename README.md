@@ -1,5 +1,7 @@
 # 🌍 SpotOn  
-**Your Only Destination for Destinations**  
+**Your Only Destination for Destinations** 
+
+live preview: https://aartiworkk.github.io/SpotOn/
 
 SpotOn is a sleek, modern web application that helps users discover nearby places such as **restaurants, petrol pumps, hospitals, ATMs, cafes, pharmacies**, and more — all powered by **OpenStreetMap + Overpass API**.  
 
