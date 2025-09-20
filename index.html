@@ -31,7 +31,7 @@
     }
 
     header {
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(90deg, #87CEEB 0%, #00BFFF 100%);
       color: white;
       padding: 1.8rem 2.5rem;
       position: relative;
@@ -175,8 +175,8 @@
 
     input:focus, select:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+      border-color: #87CEEB;
+      box-shadow: 0 0 0 4px rgba(135, 206, 235, 0.2);
     }
 
     .slider-container {
@@ -188,7 +188,7 @@
 
     .slider-value {
       font-weight: 600;
-      color: #667eea;
+      color: #87CEEB;
       text-align: center;
       font-size: 1.1rem;
     }
@@ -198,7 +198,7 @@
       height: 10px;
       background: #e0e0e0;
       border-radius: 5px;
-      background-image: linear-gradient(to right, #667eea, #764ba2);
+      background-image: linear-gradient(to right, #87CEEB, #00BFFF);
       background-size: 50% 100%;
       background-repeat: no-repeat;
     }
@@ -208,7 +208,7 @@
       height: 22px;
       width: 22px;
       border-radius: 50%;
-      background: #667eea;
+      background: #87CEEB;
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
       transition: all 0.2s;
@@ -217,7 +217,7 @@
 
     input[type="range"]::-webkit-slider-thumb:hover {
       transform: scale(1.2);
-      background: #764ba2;
+      background: #00BFFF;
     }
 
     .button-group {
@@ -252,8 +252,8 @@
     }
 
     .btn-primary {
-      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(90deg, #87CEEB 0%, #00BFFF 100%);
+      box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
     }
 
     .btn-success {
@@ -310,7 +310,7 @@
       background: white;
       border-radius: 12px;
       padding: 16px;
-      border-left: 5px solid #667eea;
+      border-left: 5px solid #87CEEB;
       transition: all 0.25s;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -353,12 +353,12 @@
       display: none;
       text-align: center;
       padding: 25px;
-      color: #667eea;
+      color: #87CEEB;
     }
 
     .loading-spinner {
       border: 5px solid #f3f3f3;
-      border-top: 5px solid #667eea;
+      border-top: 5px solid #87CEEB;
       border-radius: 50%;
       width: 50px;
       height: 50px;
@@ -578,7 +578,7 @@
     // Create a custom icon for the location marker
     const locationIcon = L.divIcon({
       className: 'location-marker',
-      html: '<i class="fas fa-location-dot" style="font-size: 32px; color: #667eea;"></i>',
+      html: '<i class="fas fa-location-dot" style="font-size: 32px; color: #87CEEB;"></i>',
       iconSize: [32, 32],
       iconAnchor: [16, 32]
     });
@@ -766,7 +766,7 @@
                   ${place.tags.amenity ? '<br>Type: ' + place.tags.amenity : ''}
                 </div>
                 <div class="result-actions">
-                  <button onclick="centerMap(${place.lat}, ${place.lon})" style="background: #667eea;">
+                  <button onclick="centerMap(${place.lat}, ${place.lon})" style="background: #87CEEB;">
                     <i class="fas fa-map-marker-alt"></i> View on Map
                   </button>
                   <button onclick="openDirections(${place.lat}, ${place.lon})" style="background: #48bb78;">
